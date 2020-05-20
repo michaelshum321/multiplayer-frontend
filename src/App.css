@@ -1,3 +1,7 @@
+canvas {
+  position: absolute;
+}
+
 .App {
   text-align: center;
 }
