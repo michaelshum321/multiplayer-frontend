@@ -1,29 +1,34 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
-import worker from "workerize-loader!./worker"; // eslint-disable-line import/no-webpack-loader-syntax
+import Buttons from "./Buttons";
 
-const w = worker();
 const RECT_SIZE = 20;
 const RECT_OFFSET = RECT_SIZE / 2;
-const worky = () => w.doodoo();
 
 let sock;
 
 function App() {
   const canvasRef = React.useRef(null);
+  const websocketRef = React.useRef(null);
 
   const [locations, setLocations] = React.useState([]);
   const [created, setCreated] = React.useState(false);
   const [connected, setConnected] = React.useState(false);
+
   const connectClick = () => {
-    if (sock) return;
-    sock = new WebSocket("ws://127.0.0.1:8080");
-    sock.onmessage = (evt) => console.log("evt", evt);
-    sock.onerror = (evt) => console.error("err", evt);
+    console.log("ref", websocketRef);
+    if (websocketRef.current) return;
+    websocketRef.current = new WebSocket("ws://127.0.0.1:8080");
+    const ws = websocketRef.current;
+    ws.onmessage = (evt) => console.log("msg", evt);
+    ws.onerror = (evt) => {
+      setConnected(false);
+      console.error("err", evt);
+    };
     setConnected(true);
-    console.log("ws made");
+    console.log("ws made", websocketRef.current);
   };
+
   const draw = (canvas, loc) => {
     const ctx = canvas.getContext("2d");
     const rect = canvas.getBoundingClientRect();
@@ -70,14 +75,11 @@ function App() {
   });
   return (
     <div>
-      <div className={"buttons"}>
-        <button onClick={leftClick}>left</button>
-        <button onClick={worky}>right</button>
-        <button>up</button>
-        <button>down</button>
-        <button onClick={connectClick}>Connect</button>
-        {connected && "Connected!"}
-      </div>
+      <Buttons
+        connected={connected}
+        onLeftClick={leftClick}
+        onConnectClick={}
+      />
       <canvas
         ref={canvasRef}
         width={window.innerWidth}
