@@ -40,7 +40,7 @@ function App() {
   const dirClick = (dir) => {
     if (!websocketRef.current || !connected) return;
     // send cmd to backend
-    //websocketRef.current.send(JSON.stringify({ Direction: dir }));
+    websocketRef.current.send(JSON.stringify({ Direction: dir }));
     const pastLocation = locations[0];
     let newX, newY;
     switch (dir) {
