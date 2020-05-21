@@ -12,6 +12,7 @@ export const getCellBoundaries = (x, y) => {
     y: minBoundary(y),
   };
 };
+
 const Grid = ({ x, y, width, height }) => {
   const canvasRef = React.useRef(null);
   React.useEffect(() => {

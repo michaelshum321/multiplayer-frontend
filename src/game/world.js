@@ -9,6 +9,7 @@ const World = ({ grid, locations }) => {
   React.useEffect(() => {
     const canvas = worldRef.current;
     const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, grid.width, grid.height);
     locations &&
       locations.forEach((loc) => {
         ctx.fillStyle = "#FF0000";
