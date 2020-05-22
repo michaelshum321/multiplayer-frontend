@@ -10,13 +10,14 @@ const World = ({ grid, locations }) => {
     const canvas = worldRef.current;
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, grid.width, grid.height);
-    locations &&
-      locations.forEach((loc) => {
-        ctx.fillStyle = "#FF0000";
-        const { x, y } = getCellBoundaries(loc.x, loc.y);
-        ctx.fillRect(x, y, RECT_SIZE, RECT_SIZE);
-        ctx.restore();
-      });
+    if (!locations) return;
+    for (const key in locations) {
+      console.log("drawing", locations[key]);
+      ctx.fillStyle = "#FF0000";
+      const { x, y } = getCellBoundaries(locations[key].x, locations[key].y);
+      ctx.fillRect(x, y, RECT_SIZE, RECT_SIZE);
+      ctx.restore();
+    }
   }, [locations]);
   return (
     <div>

@@ -11,18 +11,30 @@ const GRID_SIZE = 10;
 function App() {
   const websocketRef = React.useRef(null);
 
-  const [locations, setLocations] = React.useState([]);
+  const [locations, setLocations] = React.useState({});
   const [created, setCreated] = React.useState(false);
   const [connected, setConnected] = React.useState(false);
   const [myPlayerId, setMyPlayerId] = React.useState(null);
+  const locationsRef = React.useRef({}); // used for closure in websocketMsg
+
+  React.useEffect(() => {
+    console.log("loc", locations);
+    locationsRef.current = locations;
+    const keys = Object.keys(locations);
+    if (keys.length == 1) {
+      setMyPlayerId(keys[0]);
+    }
+  }, [locations]);
+
   const websocketMsg = (evt) => {
     // TODO: where should I put my command parsing?
-    try {
-      const msg = JSON.parse(evt.data);
-      setMyPlayerId(msg["PlayerID"]);
-      setLocations([{ x: msg["X"], y: msg["Y"] }]);
-    } catch (e) {}
-    console.log(evt.data);
+    console.log("evt", evt);
+    const msg = JSON.parse(evt.data);
+    setLocations((prev) => {
+      const newLocations = Object.assign({}, prev);
+      newLocations[msg.PlayerID] = { x: msg.X, y: msg.Y };
+      return newLocations;
+    });
   };
   const connectClick = () => {
     if (websocketRef.current) return;
@@ -41,7 +53,7 @@ function App() {
     if (!websocketRef.current || !connected) return;
     // send cmd to backend
     websocketRef.current.send(JSON.stringify({ Direction: dir }));
-    const pastLocation = locations[0];
+    const pastLocation = locations[myPlayerId];
     let newX, newY;
     switch (dir) {
       case Directions.LEFT:
@@ -62,9 +74,9 @@ function App() {
     }
 
     // change location of our elem
-    const newLoc = { x: newX, y: newY };
-    console.log("new loc", newLoc);
-    setLocations([newLoc]);
+    const newLocations = Object.assign({}, locations);
+    newLocations[myPlayerId] = { x: newX, y: newY };
+    setLocations(newLocations);
   };
 
   const gridProps = {
